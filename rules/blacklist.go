@@ -15,6 +15,7 @@
 package rules
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 
@@ -58,37 +59,11 @@ func NewBlacklistedImports(id string, conf gosec.Config, blacklist map[string]st
 	}, []ast.Node{(*ast.ImportSpec)(nil)}
 }
 
-// NewBlacklistedImportMD5 fails if MD5 is imported
-func NewBlacklistedImportMD5(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/md5": "Blacklisted import crypto/md5: weak cryptographic primitive",
-	})
-}
-
-// NewBlacklistedImportDES fails if DES is imported
-func NewBlacklistedImportDES(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/des": "Blacklisted import crypto/des: weak cryptographic primitive",
-	})
-}
-
-// NewBlacklistedImportRC4 fails if DES is imported
-func NewBlacklistedImportRC4(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/rc4": "Blacklisted import crypto/rc4: weak cryptographic primitive",
-	})
-}
-
-// NewBlacklistedImportCGI fails if CGI is imported
-func NewBlacklistedImportCGI(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"net/http/cgi": "Blacklisted import net/http/cgi: Go versions < 1.6.3 are vulnerable to Httpoxy attack: (CVE-2016-5386)",
-	})
-}
-
-// NewBlacklistedImportSHA1 fails if SHA1 is imported
-func NewBlacklistedImportSHA1(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/sha1": "Blacklisted import crypto/sha1: weak cryptographic primitive",
-	})
+// NewBlacklistedImport fails with reason if path is imported.
+func NewBlacklistedImport(path, reason string) gosec.RuleBuilder {
+	return func(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
+		return NewBlacklistedImports(id, conf, map[string]string{
+			path: fmt.Sprintf("Blacklisted import %s: %s", path, reason),
+		})
+	}
 }

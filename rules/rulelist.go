@@ -87,11 +87,11 @@ func Generate(filters ...RuleFilter) RuleList {
 		{"G404", "Insecure random number source (rand)", NewWeakRandCheck},
 
 		// blacklist
-		{"G501", "Import blacklist: crypto/md5", NewBlacklistedImportMD5},
-		{"G502", "Import blacklist: crypto/des", NewBlacklistedImportDES},
-		{"G503", "Import blacklist: crypto/rc4", NewBlacklistedImportRC4},
-		{"G504", "Import blacklist: net/http/cgi", NewBlacklistedImportCGI},
-		{"G505", "Import blacklist: crypto/sha1", NewBlacklistedImportSHA1},
+		{"G501", "Import blacklist: crypto/md5", NewBlacklistedImport("crypto/md5", "weak cryptographic primitive")},
+		{"G502", "Import blacklist: crypto/des", NewBlacklistedImport("crypto/des", "weak cryptographic primitive")},
+		{"G503", "Import blacklist: crypto/rc4", NewBlacklistedImport("crypto/rc4", "weak cryptographic primitive")},
+		{"G504", "Import blacklist: net/http/cgi", NewBlacklistedImport("net/http/cgi", "Go versions < 1.6.3 are vulnerable to Httpoxy attack: (CVE-2016-5386)")},
+		{"G505", "Import blacklist: crypto/sha1", NewBlacklistedImport("crypto/sha1", "weak cryptographic primitive")},
 	}
 
 	ruleMap := make(map[string]RuleDefinition)
