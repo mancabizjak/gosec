@@ -87,11 +87,7 @@ or to specify a set of rules to explicitly exclude using the '-exclude=' flag.
 - G402: Look for bad TLS connection settings
 - G403: Ensure minimum RSA key length of 2048 bits
 - G404: Insecure random number source (rand)
-- G501: Import blacklist: crypto/md5
-- G502: Import blacklist: crypto/des
-- G503: Import blacklist: crypto/rc4
-- G504: Import blacklist: net/http/cgi
-- G505: Import blacklist: crypto/sha1
+- G501: Import blacklist
 
 ```bash
 # Run a specific set of rules
@@ -128,6 +124,23 @@ of functions which will be skipped when auditing the not checked errors:
 {
     "G104": {
         "io/ioutil": ["WriteFile"]
+    }
+}
+```
+
+Rule `501` also accepts custom configuration. By default, gosec will blacklist the following import paths:
+* crypto/md5
+* crypto/des
+* crypto/rc4
+* net/http/cgi
+* crypto/sha1
+  
+To customize blacklisted imports, you may provide the following configuration:
+
+```JSON
+{
+    "G501": {
+        "crypto/md5": "weak cryptographic primitive"
     }
 }
 ```
