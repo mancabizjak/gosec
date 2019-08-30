@@ -1083,8 +1083,9 @@ func main() {
 	println(i)
 }`}, 0, gosec.NewConfig()}}
 
-	// SampleCodeG501 - Blacklisted import MD5
+	// SampleCodeG501 - Blacklisted imports
 	SampleCodeG501 = []CodeSample{
+		// Blacklisted import MD5
 		{[]string{`
 package main
 import (
@@ -1096,38 +1097,37 @@ func main() {
 	for _, arg := range os.Args {
 		fmt.Printf("%x - %s\n", md5.Sum([]byte(arg)), arg)
 	}
-}`}, 1, gosec.NewConfig()}}
+}`}, 1, gosec.NewConfig()},
 
-	// SampleCodeG502 - Blacklisted import DES
-	SampleCodeG502 = []CodeSample{
+		// Blacklisted import DES
 		{[]string{`
 package main
 import (
-	"crypto/cipher"
-	"crypto/des"
-	"crypto/rand"
-	"encoding/hex"
-	"fmt"
-	"io"
+"crypto/cipher"
+"crypto/des"
+"crypto/rand"
+"encoding/hex"
+"fmt"
+"io"
 )
 func main() {
-	block, err := des.NewCipher([]byte("sekritz"))
-	if err != nil {
-		panic(err)
-	}
-	plaintext := []byte("I CAN HAZ SEKRIT MSG PLZ")
-	ciphertext := make([]byte, des.BlockSize+len(plaintext))
-	iv := ciphertext[:des.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
-	}
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[des.BlockSize:], plaintext)
-	fmt.Println("Secret message is: %s", hex.EncodeToString(ciphertext))
-}`}, 1, gosec.NewConfig()}}
+block, err := des.NewCipher([]byte("sekritz"))
+if err != nil {
+	panic(err)
+}
+plaintext := []byte("I CAN HAZ SEKRIT MSG PLZ")
+ciphertext := make([]byte, des.BlockSize+len(plaintext))
+iv := ciphertext[:des.BlockSize]
+if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+	panic(err)
+}
+stream := cipher.NewCFBEncrypter(block, iv)
+stream.XORKeyStream(ciphertext[des.BlockSize:], plaintext)
+fmt.Println("Secret message is: %s", hex.EncodeToString(ciphertext))
+}`}, 1, gosec.NewConfig()},
 
-	// SampleCodeG503 - Blacklisted import RC4
-	SampleCodeG503 = []CodeSample{{[]string{`
+		// Blacklisted import RC4
+		{[]string{`
 package main
 import (
 	"crypto/rc4"
@@ -1143,10 +1143,10 @@ func main() {
 	ciphertext := make([]byte, len(plaintext))
 	cipher.XORKeyStream(ciphertext, plaintext)
 	fmt.Println("Secret message is: %s", hex.EncodeToString(ciphertext))
-}`}, 1, gosec.NewConfig()}}
+}`}, 1, gosec.NewConfig()},
 
-	// SampleCodeG504 - Blacklisted import CGI
-	SampleCodeG504 = []CodeSample{{[]string{`
+		// Blacklisted import CGI
+		{[]string{`
 package main
 import (
 	"net/http/cgi"
@@ -1154,9 +1154,9 @@ import (
  )
 func main() {
 	cgi.Serve(http.FileServer(http.Dir("/usr/share/doc")))
-}`}, 1, gosec.NewConfig()}}
-	// SampleCodeG505 - Blacklisted import SHA1
-	SampleCodeG505 = []CodeSample{
+}`}, 1, gosec.NewConfig()},
+
+		// Blacklisted import SHA1
 		{[]string{`
 package main
 import (
@@ -1168,7 +1168,23 @@ func main() {
 	for _, arg := range os.Args {
 		fmt.Printf("%x - %s\n", sha1.Sum([]byte(arg)), arg)
 	}
-}`}, 1, gosec.NewConfig()}}
+}`}, 1, gosec.NewConfig()},
+
+		// Override defaults and blacklist custom imports
+		{[]string{`
+package main
+import (
+	"crypto/sha1"
+	"fmt"
+	"os"
+)
+func main() {
+	for _, arg := range os.Args {
+		fmt.Printf("%x - %s\n", sha1.Sum([]byte(arg)), arg)
+	}
+}`}, 1, gosec.Config{"501": map[string]string{"fmt": "should not use fmt"}}},
+	}
+
 	// SampleCode601 - Go build tags
 	SampleCode601 = []CodeSample{{[]string{`
 // +build tag

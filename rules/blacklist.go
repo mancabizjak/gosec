@@ -15,6 +15,7 @@
 package rules
 
 import (
+	"fmt"
 	"go/ast"
 	"strings"
 
@@ -58,37 +59,34 @@ func NewBlacklistedImports(id string, conf gosec.Config, blacklist map[string]st
 	}, []ast.Node{(*ast.ImportSpec)(nil)}
 }
 
-// NewBlacklistedImportMD5 fails if MD5 is imported
-func NewBlacklistedImportMD5(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/md5": "Blacklisted import crypto/md5: weak cryptographic primitive",
-	})
+// NewBlacklistedImport fails if any of the paths specified in conf are imported.
+func NewBlacklistedImport(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
+	var blacklist map[string]string
+	customBlacklist, err := conf.Get(id)
+	if err == nil {
+		blacklist = customBlacklist.(map[string]string) // TODO catch conversion err?
+	} else {
+		blacklist = defaultBlacklistedImports()
+	}
+	if configured, ok := conf[id]; ok {
+		if blacklisted, ok := configured.(map[string]string); ok {
+			for path, reason := range blacklisted {
+				blacklist[path] = fmt.Sprintf("Blacklisted import %s: %s", path, reason)
+			}
+		}
+	}
+
+	return NewBlacklistedImports(id, conf, blacklist)
 }
 
-// NewBlacklistedImportDES fails if DES is imported
-func NewBlacklistedImportDES(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/des": "Blacklisted import crypto/des: weak cryptographic primitive",
-	})
-}
-
-// NewBlacklistedImportRC4 fails if DES is imported
-func NewBlacklistedImportRC4(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/rc4": "Blacklisted import crypto/rc4: weak cryptographic primitive",
-	})
-}
-
-// NewBlacklistedImportCGI fails if CGI is imported
-func NewBlacklistedImportCGI(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"net/http/cgi": "Blacklisted import net/http/cgi: Go versions < 1.6.3 are vulnerable to Httpoxy attack: (CVE-2016-5386)",
-	})
-}
-
-// NewBlacklistedImportSHA1 fails if SHA1 is imported
-func NewBlacklistedImportSHA1(id string, conf gosec.Config) (gosec.Rule, []ast.Node) {
-	return NewBlacklistedImports(id, conf, map[string]string{
-		"crypto/sha1": "Blacklisted import crypto/sha1: weak cryptographic primitive",
-	})
+// defaultBlacklistedImports returns a blacklist containing import paths that
+// will be blacklisted by default.
+func defaultBlacklistedImports() map[string]string {
+	return map[string]string{
+		"crypto/md5":   "weak cryptographic primitive",
+		"crypto/des":   "weak cryptographic primitive",
+		"crypto/rc4":   "weak cryptographic primitive",
+		"net/http/cgi": "Go versions < 1.6.3 are vulnerable to Httpoxy attack: (CVE-2016-5386)",
+		"crypto/sha1":  "weak cryptographic primitive",
+	}
 }

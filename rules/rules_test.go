@@ -139,23 +139,8 @@ var _ = Describe("gosec rules", func() {
 			runner("G404", testutils.SampleCodeG404)
 		})
 
-		It("should detect blacklisted imports - MD5", func() {
+		It("should detect blacklisted imports", func() {
 			runner("G501", testutils.SampleCodeG501)
-		})
-
-		It("should detect blacklisted imports - DES", func() {
-			runner("G502", testutils.SampleCodeG502)
-		})
-
-		It("should detect blacklisted imports - RC4", func() {
-			runner("G503", testutils.SampleCodeG503)
-		})
-
-		It("should detect blacklisted imports - CGI (httpoxy)", func() {
-			runner("G504", testutils.SampleCodeG504)
-		})
-		It("should detect blacklisted imports - SHA1", func() {
-			runner("G505", testutils.SampleCodeG505)
 		})
 
 	})
